@@ -1,17 +1,115 @@
 ---
-
+import Layout from "../layouts/Layout.astro";
+import "../styles/global.css";
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
-</html>
+<Layout title="Bienvenido">
+  <main class="intro-container">
+    <div class="doodle-background"></div>
+
+    <a href="/portfolio" class="character-link">
+    <div id="character" class="character-wrapper">
+      <img
+        src="/assets/svg/persona_mock.svg"
+        alt="Personaje"
+        class="main-char"
+      />
+
+      <div id="lightbulb" class="lightbulb-hidden">
+        <img src="/assets/svg/lampara_mock.svg" alt="Know Me" />
+      </div>
+    </div>
+    </a>
+  </main>
+</Layout>
+
+<script>
+  const character = document.getElementById("character");
+  const lightbulb = document.getElementById("lightbulb");
+
+  document.addEventListener("mousemove", (e) => {
+    if (!character || !lightbulb) return;
+
+    // Obtenemos el centro del personaje
+    const rect = character.getBoundingClientRect();
+    const charX = rect.left + rect.width / 2;
+    const charY = rect.top + rect.height / 2;
+
+    // Posicionn del mouse
+    const mouseX = e.clientX;
+    const mouseY = e.clientY;
+
+    // Piagoras a**2 + b**2 = c**2
+    const distance = Math.sqrt(
+      Math.pow(mouseX - charX, 2) + Math.pow(mouseY - charY, 2),
+    );
+
+    // Si la distancia del puntero es menor a 150px mostramos la lampara
+    if (distance < 150) {
+      lightbulb.classList.remove("hidden");
+    } else {
+      lightbulb.classList.add("hidden");
+    }
+  });
+</script>
+
+<style>
+  .intro-container {
+    width: 100vw;
+    height: 100vh;
+    position: relative;
+    overflow: hidden;
+    background-color: aliceblue;
+    
+  }
+
+  .doodle-background {
+    position: absolute;
+    inset: 0;
+    background-image: url("/assets/img/camino_mock.jpg");
+    background-size: cover;
+    opacity: 0.3;
+    z-index: 1;
+  }
+
+  .character-link {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 20;
+    text-decoration: none;
+    cursor: pointer;
+  }
+
+  .character-wrapper {
+    display: flex;
+    flex-direction: column-reverse;
+    align-items: center;
+    gap: 20px;
+  }
+
+  .main-char {
+    width: 200px;
+    height: auto;
+  }
+
+  .lightbulb {
+    width: 60px;
+    height: auto;
+    transition: all 0.3s ease;
+  }
+
+  .hidden {
+    opacity: 0;
+    transform: translateX(-50%) translateY(20px);
+    pointer-events: none;
+  }
+  .enter-zone {
+    position: absolute;
+    inset: 0;
+    z-index: 5;
+  }
+
+  
+</style>
