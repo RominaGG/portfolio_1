@@ -251,10 +251,14 @@ import ProjectBook from "../components/ProjectBook.astro";
   }
 
   function initBook() {
-    const leaves = document.querySelectorAll(".leaf");
+    const leaves = document.querySelectorAll<HTMLElement>(".leaf");
     const btnPrev = document.getElementById("btn-prev") as HTMLButtonElement;
     const btnNext = document.getElementById("btn-next") as HTMLButtonElement;
     let currenPage = 0;
+
+    setTimeout(() => {
+      document.querySelector('.book')?.classList.add('open');
+    }, 20);
 
     const updateButtons = () => {
       if (btnPrev && btnNext) {
@@ -266,6 +270,7 @@ import ProjectBook from "../components/ProjectBook.astro";
     if (btnNext) {
       btnNext.onclick = () => {
         if (currenPage < leaves.length) {
+          leaves[currenPage].style.transitionDelay = '0.03s'
           leaves[currenPage].classList.add("flipped");
           currenPage++;
           updateButtons();
@@ -276,7 +281,9 @@ import ProjectBook from "../components/ProjectBook.astro";
       btnPrev.onclick = () => {
         if (currenPage > 0) {
           currenPage--;
+          
           leaves[currenPage].classList.remove("flipped");
+          leaves[currenPage].style.transitionDelay = '0s'
           updateButtons();
         }
       };

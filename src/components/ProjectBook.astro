@@ -62,44 +62,12 @@ const bookData = translations[lang].proyectos;
   </div>
 
   <div class="book-controls">
-    <button id="btn-prev" class="book-btn" disabled>◀ Anterior</button>
+    <button id="btn-prev" class="book-btn" disabled> Anterior ▶</button>
     <button id="btn-next" class="book-btn">Siguiente ▶</button>
   </div>
 </div>
 
-<!-- 
-<script>
-  //Solo ejecuta para el libro
-  const leaves = document.querySelectorAll('.leaf');
-  const btnPrev = document.getElementById('btn-prev') as HTMLButtonElement;
-  const btnNext = document.getElementById('btn-next') as HTMLButtonElement;
 
-  let currentPage = 0;
-  
-  const updateButtons = () => {
-    if (btnPrev && btnNext) {
-        btnPrev.disabled = currentPage === 0;
-        btnNext.disabled = currentPage === leaves.length;
-    }
-  };
-
-  btnNext?.addEventListener('click', () => {
-    if (currentPage < leaves.length) {
-        // GIro 3D
-        leaves[currentPage].classList.add('flipped');
-        currentPage++;
-        updateButtons();
-    }
-  });
-
-  btnPrev?.addEventListener('click', () => {
-    if (currentPage > 0) {
-        currentPage--;
-        //le saco la clase y vuelve a su lugar original
-        leaves[currentPage].classList.remove('flipped');
-    }
-  });
-</script>-->
 
 <style>
   
@@ -126,6 +94,13 @@ const bookData = translations[lang].proyectos;
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
     border-radius: 5px;
     position: relative;
+    transform: scale(0.8);
+    opacity: 0;
+    transition: transform 0.5s ease, opacity 0.4s ease;
+  }
+  .book.open {
+    transform: scale(1);
+    opacity: 1;
   }
 
   .book::after {
@@ -151,7 +126,7 @@ const bookData = translations[lang].proyectos;
   .page-left {
     left: 0;
     background: #fffcf2;
-    border-radius: 15px 0 0 15px;
+    border-radius: 5px 0 0 5px;
     padding: 3rem 4rem 3rem 3rem;
     box-shadow: inset -15px 0 20px -15px rgba(0, 0, 0, 0.05);
     z-index: 1;
@@ -171,12 +146,32 @@ const bookData = translations[lang].proyectos;
 
   .page-right {
     left: 50%;
+    background: white;
     transform-origin: left center; /*Gira desde el borde izq */
-    transition: transform 0.8s cubic-bezier(0.645, 0.045, 0.355, 1);
+    transition: transform 0.9s cubic-bezier(0.22, 1, 0.35, 1),
+    box-shadow 0.4s ease;
     transform-style: preserve-3d; /*Permite caras frontales y traseras */
   } 
+
+  .page-right::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      to right, 
+      rgba(0,0,0,0.08),
+      transparent 40%
+    );
+    opacity: 0;
+    transition: opacity 0.4s;
+    pointer-events: none;
+  }
   .page-right.flipped {
-    transform: rotateY(-180deg) /*Da vuelta la pagina */;
+    transform: rotateY(-180deg) rotateZ(-2deg) scaleX(0.97)/*Da vuelta la pagina */;
+    box-shadow: -15px 0 0 rgba(0,0,0,0.15);
+  }
+  .page-right.flipped::before {
+    opacity: 1;
   }
 
   .page-face {
@@ -184,19 +179,36 @@ const bookData = translations[lang].proyectos;
     width: 100%;
     height: 100%;
     backface-visibility: hidden;
-    background: #fffcf2;
+    -webkit-backface-visibility: hidden;
+    background: #ffffff;
     padding: 3rem 3rem 3rem 4rem;
+    border: 2px solid  black;
+  }
+
+  .page-face::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: repeating-linear-gradient(
+      0deg,
+      rgba(0,0,0,0.015) 0px,
+      rgba(0,0,0,0.015) 1px,
+      transparent 1px,
+      transparent 4px
+
+    );
+    pointer-events: none;
   }
 
   .page-front {
-    border-radius: 0 15px 15px 0;
-    box-shadow: inset 15px 0 20px -15px rgba(0, 0, 0, 0.02);
+    border-radius: 0 5px 5px 0;
+    box-shadow: inset 8px 0 0 rgba(0, 0, 0, 0.05);
   }
 
   .page-back {
     transform: rotateY(180deg); /*Pre-rotacion para que este lista */
     background: #f4eedc;
-    border-radius: 15px 0 0 15px;
+    border-radius: 5px 0 0 5px;
     box-shadow: inset -15px 0 20px -15px rgba(0, 0, 0, 0.02);
     display: flex;
     justify-content: center;
@@ -274,12 +286,28 @@ const bookData = translations[lang].proyectos;
 
   /* Botones */
 
+   .book-controls {
+    position: absolute;
+    top: 50%;
+    left: -80px;
+    width: calc(100% + 160px);
+    display: flex;
+    
+    justify-content: space-between;
+    gap: 15px;
+    transform: translateY(-50%);
+    pointer-events: none;
+    z-index: 10;
+  }
+  /*
   .book-btn {
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
     pointer-events: auto;
     background: #d32f2f;
     color: white;
     border: none;
-    padding: 15px 20px;
+    padding: 15px;
     border-radius: 50% 20% / 10% 40%;
     cursor: pointer;
     font-family: var(--font-main);
@@ -288,7 +316,46 @@ const bookData = translations[lang].proyectos;
     transition: 0.3s;
     box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.2);
   }
+  #btn-prev {
+    transform: rotate(180deg);
+  }*/
 
+  .book-btn {
+    background: transparent;
+    color: #d32f2f;
+    border: 2px solid #000;
+    font-family: var(--font-main);
+    font-size: 1.4rem;
+    padding: 10px 8px;
+    height: 120px;
+    width: 50px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+
+    cursor: pointer;
+    position: relative;
+
+    border-radius: 12px 8px 15px 10px;
+    box-shadow: 1px 1px 0 #000,
+    -1px .1px 0 #000;
+  }
+
+  .book-btn::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border: 1px solid #000;
+    transform: translate(2px, -2px);
+    opacity: 0.6;
+    pointer-events: auto;
+  }
+
+ 
   .book-btn:disabled {
     background: #ccc;
     cursor: not-allowed;
@@ -300,17 +367,15 @@ const bookData = translations[lang].proyectos;
     transform: scale(1.05) rotate(5deg);
   }
 
-  .book-controls {
-    position: absolute;
-    top: 50%;
-    width: calc(100% + 160px);
-    left: -80px;
-    display: flex;
-    justify-content: space-between;
-    transform: translateY(-50%);
-    pointer-events: none;
-    z-index: 10;
-  }
+ @keyframes wobble {
+  0% {transform: rotate(-2deg);}
+  50% {transform: rotate(2deg);}
+  100% {transform: rotate(-2deg);}
+ }
+
+ .book-btn:hover {
+  animation: wobble 0.4s ease-in-out;
+ }
 
  
 
