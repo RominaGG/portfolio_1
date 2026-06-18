@@ -5,18 +5,32 @@ interface Props {
 
 const { lang } = Astro.props;
 import { translations } from "../data/content.js";
+import CheshireCat from "./CheshireCat.astro";
 // traemos los proyectos segun el idioma
 const projects = translations[lang].proyectos.items;
 const bookData = translations[lang].proyectos;
 ---
 
-<div class="book-scene">
-  <div class="book" id="portfolio-book">
-    <div class="page page-left">
-      <h2>{bookData.title}</h2>
-      <p>{bookData.intro}</p>
-      <div class="paper-texture"></div>
-    </div>
+<div class="portfolio-wrapper">
+
+  <div class="closed-book-scene" id="closed-book">
+    <img
+      src="/assets/img/C_1_book.png"
+      alt="Libro Cerrado"
+      class="closed-book-img"
+    />
+    <span class="click-hint">{lang === "es" ? "Haz click" : "Click me"}</span>
+  </div>
+
+  <div class="book-scene" id="interactive-book" style="display: none;">
+    <CheshireCat />
+    <div class="book" id="portfolio-book">
+      <div class="page page-left">
+        <h2>{bookData.title}</h2>
+        <p>{bookData.intro}</p>
+        <div class="paper-texture"></div>
+      </div>
+    
 
     {
       projects.map((proj, index) => (
@@ -27,38 +41,51 @@ const bookData = translations[lang].proyectos;
         >
           <div class="page-face page-front">
             <div class="project-card">
-                <img src={proj.imagen || '/assets/img/camino_mock.jpg'} alt={`Ìmagende ${proj.name}` } class="project-img" />
-                <div class="project-info">
-<h4>{proj.name}</h4>
-              <p>{proj.description}</p>
-              <div class="project-tags">
-                {proj.tags.map((tag) => (
-                  <span>{tag}</span>
-                ))}
+              <img
+                src={proj.imagen || "/assets/img/camino_mock.jpg"}
+                alt={`Ìmagende ${proj.name}`}
+                class="project-img"
+              />
+              <div class="project-info">
+                <h4>{proj.name}</h4>
+                <p>{proj.description}</p>
+                <div class="project-tags">
+                  {proj.tags.map((tag) => (
+                    <span>{tag}</span>
+                  ))}
+                </div>
+                <a
+                  href={proj.linkUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="project-link"
+                >
+                  {proj.linkLabel}
+                </a>
               </div>
-              <a
-                href={proj.linkUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                class="project-link"
-              >
-                {proj.linkLabel}
-              </a>
             </div>
 
-                </div>
-              
             <span class="page-number">
               {index + 1} / {projects.length}
             </span>
           </div>
 
           <div class="page-face page-back">
-            <div class="back-logo">📂</div>
+            
           </div>
         </div>
       ))
     }
+
+    <!-- Contratapa -->
+     <div class="page page-right end-page" >
+      <div class="page-face page-front end-content">
+        <h3 class="end-title">
+          {lang === 'es' ? 'Continuará...' : 'To be continued...'}
+        </h3>
+        <div class="end-icon">icono a pensar</div>
+      </div>
+     </div>
   </div>
 
   <div class="book-controls">
@@ -66,14 +93,46 @@ const bookData = translations[lang].proyectos;
     <button id="btn-next" class="book-btn">Siguiente ▶</button>
   </div>
 </div>
-
-
+</div>
 
 <style>
-  
   * {
     box-sizing: border-box;
   }
+
+  .portfolio-wrapper {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .closed-book-scene {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+    transition: transform 0.3 ease;
+  }
+  .closed-book-scene:hover {
+    transform: scale(1.05) rotate(-2deg);
+  }
+  .closed-book-img {
+    width: 450px;
+    filter: drop-shadow(10px 15px 15 px rgba(0, 0, 0, 0.4));
+  }
+
+  .click-hint {
+    margin-top: 20px;
+    font-family: var(--font-fancy);
+    font-size: 1.8rem;
+    color: #333;
+    animation: pulse 1.5s infinite;
+  }
+
+
   .book-scene {
     position: relative;
     display: flex;
@@ -96,26 +155,15 @@ const bookData = translations[lang].proyectos;
     position: relative;
     transform: scale(0.8);
     opacity: 0;
-    transition: transform 0.5s ease, opacity 0.4s ease;
+    transition:
+      transform 0.5s ease,
+      opacity 0.4s ease;
   }
   .book.open {
     transform: scale(1);
     opacity: 1;
   }
 
-  .book::after {
-    content: '';
-    position: absolute;
-    left: 50%;
-    top: 0;
-    bottom: 0;
-    width: 40px;
-    background: linear-gradient(to right, rgba(0, 0, 0, 0.3) 0%, rgba(0, 0, 0, 0) 50%, rgba(0, 0, 0, 0.3) 100%);
-    transform: translateX(-50%);
-    z-index: 200;
-    pointer-events: none;
-  }
-  
   .page {
     position: absolute;
     width: 50%;
@@ -124,11 +172,16 @@ const bookData = translations[lang].proyectos;
   }
 
   .page-left {
+
     left: 0;
-    background: #fffcf2;
+    background-color: transparent;
+    background-image: url('/assets/img/C_2_openBook.png');
+    background-size: 200% 100%;
+    background-position: left center;
+    border: none;
     border-radius: 5px 0 0 5px;
     padding: 3rem 4rem 3rem 3rem;
-    box-shadow: inset -15px 0 20px -15px rgba(0, 0, 0, 0.05);
+    box-shadow: none;
     z-index: 1;
   }
 
@@ -138,37 +191,35 @@ const bookData = translations[lang].proyectos;
     color: #d32f2f;
     margin-top: 0;
     margin-bottom: 1.5rem;
+    padding-left: 40px;
+  }
+  .page-left p {
+    padding-left: 30px;
   }
   .page-left {
     font-size: 1.2rem;
-    line-height: 1.6;
+    line-height: 1.2;
   }
 
   .page-right {
     left: 50%;
-    background: white;
+    background: transparent !important;
     transform-origin: left center; /*Gira desde el borde izq */
-    transition: transform 0.9s cubic-bezier(0.22, 1, 0.35, 1),
-    box-shadow 0.4s ease;
+    box-shadow: none;
     transform-style: preserve-3d; /*Permite caras frontales y traseras */
-  } 
+  }
 
   .page-right::before {
-    content: '';
+    content: "";
     position: absolute;
     inset: 0;
-    background: linear-gradient(
-      to right, 
-      rgba(0,0,0,0.08),
-      transparent 40%
-    );
+    background: linear-gradient(to right, rgba(0, 0, 0, 0.08), transparent 40%);
     opacity: 0;
     transition: opacity 0.4s;
     pointer-events: none;
   }
   .page-right.flipped {
-    transform: rotateY(-180deg) rotateZ(-2deg) scaleX(0.97)/*Da vuelta la pagina */;
-    box-shadow: -15px 0 0 rgba(0,0,0,0.15);
+    box-shadow: -15px 0 0 rgba(0, 0, 0, 0.15);
   }
   .page-right.flipped::before {
     opacity: 1;
@@ -176,75 +227,130 @@ const bookData = translations[lang].proyectos;
 
   .page-face {
     position: absolute;
-    width: 100%;
-    height: 100%;
+    inset: 0;
     backface-visibility: hidden;
     -webkit-backface-visibility: hidden;
-    background: #ffffff;
-    padding: 3rem 3rem 3rem 4rem;
-    border: 2px solid  black;
+    background-color: transparent;
+    border: none;
   }
 
   .page-face::after {
-    content: '';
+    content: "";
     position: absolute;
     inset: 0;
     background-image: repeating-linear-gradient(
       0deg,
-      rgba(0,0,0,0.015) 0px,
-      rgba(0,0,0,0.015) 1px,
+      rgba(0, 0, 0, 0.015) 0px,
+      rgba(0, 0, 0, 0.015) 1px,
       transparent 1px,
       transparent 4px
-
     );
     pointer-events: none;
   }
 
   .page-front {
-    border-radius: 0 5px 5px 0;
-    box-shadow: inset 8px 0 0 rgba(0, 0, 0, 0.05);
+    transform: rotateY(0deg);
+    z-index: 2;
+    border-radius: 0;
+    box-shadow: none;
+    background-image: url('/assets/img/C_2_openBook.png');
+    background-size: 200% 100%;
+    background-position: right center;
+    padding: 3.5rem 3rem 2rem 4.5rem;
   }
 
   .page-back {
     transform: rotateY(180deg); /*Pre-rotacion para que este lista */
-    background: #f4eedc;
     border-radius: 5px 0 0 5px;
-    box-shadow: inset -15px 0 20px -15px rgba(0, 0, 0, 0.02);
+    z-index: 1;
+    background-image: url('/assets/im/C_2_openBook.png') !important;
+    background-position: left center !important;
+    background-color: transparent;
+    border-radius: 0 ;
+    box-shadow: none;
     display: flex;
     justify-content: center;
     align-items: center;
     font-size: 5rem;
-    opacity: 0.3;
-  }
+    }
+
+    .end-page {
+      z-index: 0;
+      box-shadow: none;
+    }
+    .end-content {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      opacity: 0.8;
+      padding: 2rem;
+    }
+
+    .end-title {
+      font-family: var(--font-fancy);
+      font-size: 3rem;
+      color: #333;
+      margin-bottom: 10px;
+      text-align: center;
+    }
+    .edn-text {
+      font-size: 1.2rem;
+      text-align: center;
+      color: #555;
+
+    }
+    .end-icon {
+      font-size: 4rem;
+      margin-top: 30px;
+    }
+
+    .project-info {
+      display: flex;
+      flex-direction: column;
+      flex-grow: 1;
+    }
 
   .project-img {
     width: 100%;
-    aspect-ratio: 4 / 3;
+    max-height: 150px;
     object-fit: cover;
     border-radius: 255px 15px 225px 15px / 5px 225px 15px 255px;
-    border: 3px solid #333;
-    margin-bottom: 15px;
+    border: 2px solid #333;
+    margin-bottom: 10px;
   }
 
   /* Tarjeta de proyecto*/
+  .project-card {
 
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    padding-right: 10px;
+  }
+
+  .project-card::-webkit-scrollbar {width: 5px;}
+  .project-card::-webkit-scrollbar-track {background: transparent;}
+  .project-card::-webkit-scrollbar-thumb { background: rgba(0, 0, 0, 0.15); border-radius: 10px;}
+  
   .project-card h4 {
     font-family: var(--font-fancy);
-    font-size: 2.2rem;
-    margin: 0 0 10px 0;
+    font-size: 1.7rem;
+    margin: 0 0 5px 0;
     color: #333;
   }
 
   .project-card p {
-    font-size: 1.1rem;
-    line-height: 1.4;
-    margin-bottom: 15px;
+    font-size: 0.95rem;
+    line-height: 1.25;
+    margin-bottom: 8px;
   }
   .project-tags {
     display: flex;
     flex-wrap: wrap;
-    gap: 8px;
-    margin: 15px 0;
+    gap: 6px;
+    margin: 10px 0;
   }
 
   .project-tags span {
@@ -261,11 +367,13 @@ const bookData = translations[lang].proyectos;
     display: inline-block;
     background: #333;
     color: #fffcf2;
-    padding: 10px 20px;
+    padding: 8px 15px;
     border-radius: 255px 15px 225px 15px / 5px 225px 15px 255px;
     text-decoration: none;
     transition: 0.3s;
-    margin-top: 5px;
+    margin-top: auto;
+    margin-bottom: 60px;
+    align-self: self-end;
     font-family: var(--font-fancy);
     letter-spacing: 1px;
   }
@@ -279,46 +387,26 @@ const bookData = translations[lang].proyectos;
     position: absolute;
     bottom: 25px;
     right: 30px;
-    color: #888;
+    color: white;
     font-weight: bold;
     font-family: var(--font-main);
   }
 
   /* Botones */
 
-   .book-controls {
+  .book-controls {
     position: absolute;
     top: 50%;
     left: -80px;
     width: calc(100% + 160px);
     display: flex;
-    
+
     justify-content: space-between;
     gap: 15px;
     transform: translateY(-50%);
     pointer-events: none;
     z-index: 10;
   }
-  /*
-  .book-btn {
-    writing-mode: vertical-rl;
-    text-orientation: mixed;
-    pointer-events: auto;
-    background: #d32f2f;
-    color: white;
-    border: none;
-    padding: 15px;
-    border-radius: 50% 20% / 10% 40%;
-    cursor: pointer;
-    font-family: var(--font-main);
-    font-size: 1.3rem;
-    font-weight: bold;
-    transition: 0.3s;
-    box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.2);
-  }
-  #btn-prev {
-    transform: rotate(180deg);
-  }*/
 
   .book-btn {
     background: transparent;
@@ -341,12 +429,13 @@ const bookData = translations[lang].proyectos;
     position: relative;
 
     border-radius: 12px 8px 15px 10px;
-    box-shadow: 1px 1px 0 #000,
-    -1px .1px 0 #000;
+    box-shadow:
+      1px 1px 0 #000,
+      -1px 0.1px 0 #000;
   }
 
   .book-btn::after {
-    content: '';
+    content: "";
     position: absolute;
     inset: 0;
     border: 1px solid #000;
@@ -355,7 +444,6 @@ const bookData = translations[lang].proyectos;
     pointer-events: auto;
   }
 
- 
   .book-btn:disabled {
     background: #ccc;
     cursor: not-allowed;
@@ -367,51 +455,64 @@ const bookData = translations[lang].proyectos;
     transform: scale(1.05) rotate(5deg);
   }
 
- @keyframes wobble {
-  0% {transform: rotate(-2deg);}
-  50% {transform: rotate(2deg);}
-  100% {transform: rotate(-2deg);}
- }
+  @keyframes wobble {
+    0% {
+      transform: rotate(-2deg);
+    }
+    50% {
+      transform: rotate(2deg);
+    }
+    100% {
+      transform: rotate(-2deg);
+    }
+  }
 
- .book-btn:hover {
-  animation: wobble 0.4s ease-in-out;
- }
-
- 
+  .book-btn:hover {
+    animation: wobble 0.4s ease-in-out;
+  }
 
   @media (max-width: 768px) {
     .book-scene {
-        perspective: none;
+      perspective: none;
     }
 
     .book {
-        flex-direction: column;
-        height: 80vh;
-        overflow-y: auto;
-        background: transparent;
-        box-shadow: none;
+      flex-direction: column;
+      height: 80vh;
+      overflow-y: auto;
+      background: transparent;
+      box-shadow: none;
     }
-    .book::after { display: none;}
+    .book::after {
+      display: none;
+    }
     .page {
-        position: relative;
-        width: 100%;
-        height: auto;
-        margin-bottom: 20px;
-        border-radius: 8px !important;
+      position: relative;
+      width: 100%;
+      height: auto;
+      margin-bottom: 20px;
+      border-radius: 8px !important;
     }
 
     .page-right {
-        left: 0;
-        transform-origin: center;
-        transition: none;
+      left: 0;
+      transform-origin: center;
+      transition: none;
     }
-    .book-controls, .page-back {
-        display: none !important;
+    .book-controls,
+    .page-back {
+      display: none !important;
     }
 
     .page-face {
-        position: relative;
-        border-radius: 8px;
+      position: relative;
+      border-radius: 8px;
     }
+  }
+
+  @keyframes pulse {
+    0% { opacity: 0.5; }
+    50% { opacity: 1; }
+    100% { opacity: 0.5; }
   }
 </style>
